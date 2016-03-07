@@ -92,7 +92,7 @@ public class ForecastFragment extends Fragment {
 
     private class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
-        private final String LOG_CAT = FetchWeatherTask.class.getSimpleName();
+        private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
         @Override
         protected String[] doInBackground(String... params) {
@@ -140,7 +140,7 @@ public class ForecastFragment extends Fragment {
                 URL url = new URL(myUri.toString());
 
 
-                Log.v(LOG_CAT,myUri.toString());
+                Log.v(LOG_TAG,myUri.toString());
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -168,9 +168,9 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
-                Log.v(LOG_CAT, forecastJsonStr);
+                Log.v(LOG_TAG, forecastJsonStr);
             } catch (IOException e) {
-                Log.e(LOG_CAT, "Error ", e);
+                Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attempting
                 // to parse it.
                 return null;
@@ -182,7 +182,7 @@ public class ForecastFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e(LOG_CAT, "Error closing stream", e);
+                        Log.e(LOG_TAG, "Error closing stream", e);
                     }
                 }
             }
@@ -190,7 +190,7 @@ public class ForecastFragment extends Fragment {
             try {
                 return getWeatherDataFromJson(forecastJsonStr, numDays);
             } catch (JSONException e) {
-                Log.e(LOG_CAT, "Error parsing JSON " + e.getLocalizedMessage());
+                Log.e(LOG_TAG, "Error parsing JSON " + e.getLocalizedMessage());
             }
             return null;
         }
@@ -288,7 +288,7 @@ public class ForecastFragment extends Fragment {
             }
 
             for (String s : resultStrs) {
-                Log.v(LOG_CAT, "Forecast entry: " + s);
+                Log.v(LOG_TAG, "Forecast entry: " + s);
             }
 
             return resultStrs;
