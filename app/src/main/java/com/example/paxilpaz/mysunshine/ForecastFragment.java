@@ -3,6 +3,7 @@ package com.example.paxilpaz.mysunshine;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +37,7 @@ import java.util.Arrays;
 public class ForecastFragment extends Fragment {
 
     private ArrayAdapter<String> forecastAdapter;
+    private TextView city;
 
     public ForecastFragment() {
     }
@@ -86,9 +89,20 @@ public class ForecastFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        city = (TextView) rootView.findViewById(R.id.city);
+        city.setText(R.string.dummy_city);
+
         ListView listView = (ListView)rootView.findViewById(R.id.list_forecast);
         listView.setAdapter(forecastAdapter);
-
+        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FetchWeatherTask fetchWeatherTask = new FetchWeatherTask();
+                String[] params = {"Avellino,it"};
+                fetchWeatherTask.execute(params);
+            }
+        });
         return rootView;
     }
 
@@ -98,8 +112,15 @@ public class ForecastFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String[] strings) {
-            forecastAdapter.clear();
-            forecastAdapter.addAll(Arrays.asList(strings));
+            if (strings != null) {
+                city.setText(strings[0]);
+                String[] newArray = new String[strings.length - 1];
+                for(int i = 0; i < newArray.length; ++i)
+                    newArray[i] = strings[i+1];
+                forecastAdapter.clear();
+                forecastAdapter.addAll(newArray);
+            }
+
         }
 
         @Override
@@ -118,7 +139,7 @@ public class ForecastFragment extends Fragment {
 
             String format = "json";
             String units = "metric";
-            int numDays = 7;
+            int numDays = 16;
 
 
             try {
@@ -238,6 +259,9 @@ public class ForecastFragment extends Fragment {
             final String OWM_MAX = "max";
             final String OWM_MIN = "min";
             final String OWM_DESCRIPTION = "main";
+            final String OWM_CITY = "city";
+            final String OWM_NAME = "name";
+            final String OWM_COUNTRY = "country";
 
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
@@ -259,8 +283,11 @@ public class ForecastFragment extends Fragment {
             // now we work exclusively in UTC
             dayTime = new Time();
 
-            String[] resultStrs = new String[numDays];
-            for(int i = 0; i < weatherArray.length(); i++) {
+            String[] resultStrs = new String[numDays + 1];
+            JSONObject cityJSONObj = forecastJson.getJSONObject(OWM_CITY);
+            resultStrs[0] = cityJSONObj.getString(OWM_NAME) + ", " +
+                    cityJSONObj.getString(OWM_COUNTRY);
+            for(int i = 0, j = 1; i < weatherArray.length(); i++, j++) {
                 // For now, using the format "Day, description, hi/low"
                 String day;
                 String description;
@@ -288,9 +315,9 @@ public class ForecastFragment extends Fragment {
                 double low = temperatureObject.getDouble(OWM_MIN);
 
                 highAndLow = formatHighLows(high, low);
-                resultStrs[i] = day + " - " + description + " - " + highAndLow;
+                resultStrs[j] = day + " - " + description + " - " + highAndLow;
             }
-            
+
             return resultStrs;
         }
     }
