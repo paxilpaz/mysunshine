@@ -34,6 +34,8 @@ import java.util.Arrays;
  */
 public class ForecastFragment extends Fragment {
 
+    private ArrayAdapter<String> forecastAdapter;
+
     public ForecastFragment() {
     }
 
@@ -77,7 +79,7 @@ public class ForecastFragment extends Fragment {
         };
 
         ArrayList<String> dataArray = new ArrayList<String>(Arrays.asList(data));
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+        forecastAdapter = new ArrayAdapter<String>(getContext(),
                 R.layout.listitem_textview,
                 R.id.listitem_textview,
                 dataArray);
@@ -85,7 +87,7 @@ public class ForecastFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         ListView listView = (ListView)rootView.findViewById(R.id.list_forecast);
-        listView.setAdapter(adapter);
+        listView.setAdapter(forecastAdapter);
 
         return rootView;
     }
@@ -93,6 +95,12 @@ public class ForecastFragment extends Fragment {
     private class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
+
+        @Override
+        protected void onPostExecute(String[] strings) {
+            forecastAdapter.clear();
+            forecastAdapter.addAll(Arrays.asList(strings));
+        }
 
         @Override
         protected String[] doInBackground(String... params) {
@@ -139,9 +147,6 @@ public class ForecastFragment extends Fragment {
 
                 URL url = new URL(myUri.toString());
 
-
-                Log.v(LOG_TAG,myUri.toString());
-
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -168,7 +173,6 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
-                Log.v(LOG_TAG, forecastJsonStr);
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attempting
@@ -201,7 +205,7 @@ public class ForecastFragment extends Fragment {
         private String getReadableDateString(long time){
             // Because the API returns a unix timestamp (measured in seconds),
             // it must be converted to milliseconds in order to be converted to valid date.
-            SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE MMM dd");
+            SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEEE, dd MMM");
             return shortenedDateFormat.format(time);
         }
 
@@ -286,11 +290,7 @@ public class ForecastFragment extends Fragment {
                 highAndLow = formatHighLows(high, low);
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;
             }
-
-            for (String s : resultStrs) {
-                Log.v(LOG_TAG, "Forecast entry: " + s);
-            }
-
+            
             return resultStrs;
         }
     }
