@@ -65,7 +65,7 @@ public class ForecastFragment extends Fragment {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
             FetchWeatherTask fetchWeatherTask = new FetchWeatherTask();
-            String[] params = {"94043,us"};
+            String[] params = {"6079660"};
             fetchWeatherTask.execute(params);
             return true;
         }
@@ -99,7 +99,7 @@ public class ForecastFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 FetchWeatherTask fetchWeatherTask = new FetchWeatherTask();
-                String[] params = {"Avellino,it"};
+                String[] params = {"6541870"};
                 fetchWeatherTask.execute(params);
             }
         });
@@ -147,7 +147,7 @@ public class ForecastFragment extends Fragment {
                 // Possible parameters are available at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
 
-                final String QUERY_PARAM = "q";
+                final String QUERY_PARAM = "id";
                 final String FORMAT_PARAM = "mode";
                 final String UNITS_PARAM = "units";
                 final String DAYS_PARAM = "cnt";
