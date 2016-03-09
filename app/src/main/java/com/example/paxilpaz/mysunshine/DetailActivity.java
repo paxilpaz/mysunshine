@@ -1,9 +1,7 @@
 package com.example.paxilpaz.mysunshine;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -17,9 +15,6 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setLogo(R.mipmap.ic_launcher);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String title = preferences.getString(getString(R.string.pref_location_key),
-                                            getString(R.string.pref_location_default));
         
         toolbar.setTitle(getIntent().getStringExtra("CITTA"));
         toolbar.setSubtitle(getIntent().getStringExtra("DATE"));
