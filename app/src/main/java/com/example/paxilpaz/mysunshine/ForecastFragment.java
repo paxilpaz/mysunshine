@@ -1,6 +1,7 @@
 package com.example.paxilpaz.mysunshine;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,7 +19,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
+
+import com.example.paxilpaz.mysunshine.databinding.FragmentMainBinding;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,8 +41,7 @@ import java.util.ArrayList;
 public class ForecastFragment extends Fragment {
 
     private ArrayAdapter<String> forecastAdapter;
-    private TextView city;
-    private String cityName;
+    private CityData cityData;
 
     public ForecastFragment() {
     }
@@ -49,6 +50,7 @@ public class ForecastFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        cityData = new CityData("test_city");
     }
 
     @Override
@@ -96,10 +98,11 @@ public class ForecastFragment extends Fragment {
                 R.layout.listitem_textview,
                 R.id.listitem_textview,
                 new ArrayList<String>());
+        FragmentMainBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false);
+        View rootView = binding.getRoot();
 
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-        TextView city = (TextView) rootView.findViewById(R.id.city);
+        cityData = new CityData("test_city");
+        binding.setCity(cityData);
 
         ListView listView = (ListView)rootView.findViewById(R.id.list_forecast);
         listView.setAdapter(forecastAdapter);
@@ -134,7 +137,7 @@ public class ForecastFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] strings) {
             if (strings != null) {
-                cityName = strings[0];
+                cityData.setCityName(strings[0]);
                 String[] newArray = new String[strings.length - 1];
                 for(int i = 0; i < newArray.length; ++i)
                     newArray[i] = strings[i+1];

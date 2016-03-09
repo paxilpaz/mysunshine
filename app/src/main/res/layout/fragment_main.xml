@@ -1,4 +1,9 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable name="city" type="com.example.paxilpaz.mysunshine.CityData" />
+    </data>
+
+<RelativeLayout
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,6 +19,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/city"
+        android:text="@{city.cityName}"
         android:layout_gravity="top"
         android:gravity="center"
         android:textStyle="bold" />
@@ -37,3 +43,4 @@
 
 
 </RelativeLayout>
+</layout>
