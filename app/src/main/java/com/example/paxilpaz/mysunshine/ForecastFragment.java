@@ -32,8 +32,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -42,6 +44,10 @@ public class ForecastFragment extends Fragment {
 
     private ArrayAdapter<String> forecastAdapter;
     private CityData cityData;
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.#");
+
+    private static final double CONVERSION_RATIO = 1.8;
+    private static final double CONVERSION_ADD = 32.0;
 
     public ForecastFragment() {
     }
@@ -50,7 +56,7 @@ public class ForecastFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        cityData = new CityData("test_city");
+        cityData = new CityData("");
     }
 
     @Override
@@ -101,7 +107,6 @@ public class ForecastFragment extends Fragment {
         FragmentMainBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false);
         View rootView = binding.getRoot();
 
-        cityData = new CityData("test_city");
         binding.setCity(cityData);
 
         ListView listView = (ListView)rootView.findViewById(R.id.list_forecast);
@@ -114,6 +119,7 @@ public class ForecastFragment extends Fragment {
                 //Toast.makeText(getActivity(),forecastString,Toast.LENGTH_SHORT).show();
                 Intent detailIntent = new Intent(getActivity(),DetailActivity.class);
                 detailIntent.putExtra(Intent.EXTRA_TEXT, forecastString);
+                detailIntent.putExtra("CITTA", cityData.getCityName());
                 startActivity(detailIntent);
             }
         });
@@ -250,7 +256,7 @@ public class ForecastFragment extends Fragment {
         private String getReadableDateString(long time){
             // Because the API returns a unix timestamp (measured in seconds),
             // it must be converted to milliseconds in order to be converted to valid date.
-            SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEEE, dd MMM");
+            SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEEE, dd MMM", Locale.ITALIAN);
             return shortenedDateFormat.format(time);
         }
 
@@ -259,10 +265,15 @@ public class ForecastFragment extends Fragment {
          */
         private String formatHighLows(double high, double low) {
             // For presentation, assume the user doesn't care about tenths of a degree.
-            long roundedHigh = Math.round(high);
-            long roundedLow = Math.round(low);
-
-            String highLowStr = roundedHigh + "/" + roundedLow;
+            String highLowStr;
+            if (PreferenceManager.getDefaultSharedPreferences(getContext())
+                    .getString(getString(R.string.pref_temperature_key),
+                            getString(R.string.pref_temperature_text)).compareTo("F") == 0) {
+                    highLowStr = DECIMAL_FORMAT.format(high * CONVERSION_RATIO + CONVERSION_ADD) +
+                            " / " + DECIMAL_FORMAT.format(low * CONVERSION_RATIO + CONVERSION_ADD);
+            } else {
+                highLowStr = DECIMAL_FORMAT.format(high) + " / " + DECIMAL_FORMAT.format(low);
+            }
             return highLowStr;
         }
 
