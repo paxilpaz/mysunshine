@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
@@ -31,7 +32,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -40,6 +40,7 @@ public class ForecastFragment extends Fragment {
 
     private ArrayAdapter<String> forecastAdapter;
     private TextView city;
+    private String cityName;
 
     public ForecastFragment() {
     }
@@ -50,6 +51,11 @@ public class ForecastFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -66,33 +72,34 @@ public class ForecastFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            FetchWeatherTask fetchWeatherTask = new FetchWeatherTask();
-            String[] params = {"6079660"};
-            fetchWeatherTask.execute(params);
+            updateWeather();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    private void updateWeather() {
+        FetchWeatherTask fetchWeatherTask = new FetchWeatherTask();
+        String location = PreferenceManager.getDefaultSharedPreferences(
+                getContext()).getString(
+                    getString(R.string.pref_location_key),
+                    getString(R.string.pref_location_default));
+        String[] params = {location};
+        fetchWeatherTask.execute(params);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        String[] data = {
-                "Today", "Tomorrow", "Wednesday", "Thursady", "Friday", "Saturday", "Sunday",
-                "Today", "Tomorrow", "Wednesday", "Thursady", "Friday", "Saturday", "Sunday"
-        };
-
-        ArrayList<String> dataArray = new ArrayList<String>(Arrays.asList(data));
         forecastAdapter = new ArrayAdapter<String>(getContext(),
                 R.layout.listitem_textview,
                 R.id.listitem_textview,
-                dataArray);
+                new ArrayList<String>());
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        city = (TextView) rootView.findViewById(R.id.city);
-        city.setText(R.string.dummy_city);
+        TextView city = (TextView) rootView.findViewById(R.id.city);
 
         ListView listView = (ListView)rootView.findViewById(R.id.list_forecast);
         listView.setAdapter(forecastAdapter);
@@ -113,7 +120,7 @@ public class ForecastFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 FetchWeatherTask fetchWeatherTask = new FetchWeatherTask();
-                String[] params = {"6541870"};
+                String[] params = {"Avellino"};
                 fetchWeatherTask.execute(params);
             }
         });
@@ -127,7 +134,7 @@ public class ForecastFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] strings) {
             if (strings != null) {
-                city.setText(strings[0]);
+                cityName = strings[0];
                 String[] newArray = new String[strings.length - 1];
                 for(int i = 0; i < newArray.length; ++i)
                     newArray[i] = strings[i+1];
@@ -161,7 +168,7 @@ public class ForecastFragment extends Fragment {
                 // Possible parameters are available at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
 
-                final String QUERY_PARAM = "id";
+                final String QUERY_PARAM = "q";
                 final String FORMAT_PARAM = "mode";
                 final String UNITS_PARAM = "units";
                 final String DAYS_PARAM = "cnt";
