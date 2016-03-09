@@ -22,6 +22,7 @@ public class DetailActivity extends AppCompatActivity {
                                             getString(R.string.pref_location_default));
         
         toolbar.setTitle(getIntent().getStringExtra("CITTA"));
+        toolbar.setSubtitle(getIntent().getStringExtra("DATE"));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);

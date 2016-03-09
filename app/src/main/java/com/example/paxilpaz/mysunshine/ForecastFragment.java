@@ -116,10 +116,14 @@ public class ForecastFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String forecastString = forecastAdapter.getItem(position);
+                String date = forecastString.split("-")[0];
+                String day = date.split(", ")[0];
+                String datedate = date.split(", ")[1];
                 //Toast.makeText(getActivity(),forecastString,Toast.LENGTH_SHORT).show();
                 Intent detailIntent = new Intent(getActivity(),DetailActivity.class);
                 detailIntent.putExtra(Intent.EXTRA_TEXT, forecastString);
                 detailIntent.putExtra("CITTA", cityData.getCityName());
+                detailIntent.putExtra("DATE",datedate);
                 startActivity(detailIntent);
             }
         });
