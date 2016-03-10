@@ -22,4 +22,6 @@
     <string name="pref_location_key">location</string>
     <string name="pref_temperature_key">temperature</string>
     <string name="pref_temperature_text">Temperature</string>
+    <string name="show_location_string">Show location</string>
+    <string name="share_string">Share</string>
 </resources>
